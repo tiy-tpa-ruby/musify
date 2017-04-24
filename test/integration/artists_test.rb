@@ -1,6 +1,21 @@
 require 'test_helper'
 
 class ArtistsTest < ActionDispatch::IntegrationTest
+  def test_index_of_artists_with_albums_include_the_albums
+    3.times do
+      FactoryGirl.create(:artist_with_albums)
+    end
+
+    # request the index page as json
+    get '/artists.json'
+
+    # Process that body response as json
+    json = JSON.parse(response.body)
+
+    first_artist = json.first
+    assert_not_equal [], first_artist["albums"]
+  end
+
 
   def test_index_should_return_a_list_of_artists
     number_of_artists = 3
@@ -58,5 +73,6 @@ class ArtistsTest < ActionDispatch::IntegrationTest
 
     assert_equal "Toni", json["name"]
     assert_equal 100, json["number_of_grammies"]
+    assert json["albums"]
   end
 end
